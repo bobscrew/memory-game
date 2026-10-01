@@ -45,43 +45,61 @@ class CardGenerator {
     }
     return cardsArray;
   }
+
+  static createDeck(numOfCards, mode) {
+    const base = this.createCards(numOfCards, mode);
+    const paired = this.createPairs(base);
+    return this.shuffle(paired);
+  }
 }
 
 class Game{
-  cards;
-  firstCard;
-  secondCard;
-  locked;
-  matched;
-  moves;
-  totalPairs;
-  timerId;
-  onUpdate;
+  #cards = null;
+  #firstCard = null;
+  #secondCard = null;
+  #locked = false;
+  #matched = 0;
+  #moves = 0;
+  #totalPairs = 0;
+  #timerId = null;
+  #config = null;
 
-  constructor(config, onUpdate){
-
+  constructor(config){
+    this.#config = config;
+    this.#totalPairs = config.pairs;
   }
 
-  start(){
+  get matched() { return this.#matched; }
+  get moves() { return this.#moves; }
 
+  start(){
+    this.#cancelTimer();
+    this.#cards = CardGenerator.createDeck(this.#config.pairs, this.#config.colorMode);
+    this.resetTurn();
+    this.#matched = 0;
+    this.#moves = 0;
   }
 
   flip(cardId){
 
   }
 
+  isWon() {
+    return this.#matched === this.#totalPairs;
+  }
+
   resetTurn(){
-    this.firstCard = none;
-    this.secondCard = none;
-    this.locked = false;
+    this.#firstCard = null;
+    this.#secondCard = null;
+    this.#locked = false;
   }
 
-  isWon(){
 
-  }
-
-  cancelTimer(){
-
+  #cancelTimer(){
+    if(this.#timerId !== null){
+      clearTimeout(this.#timerId);
+      this.#timerId = null;
+    }
   }
 
 }
