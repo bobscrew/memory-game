@@ -46,3 +46,148 @@ class CardGenerator {
     return cardsArray;
   }
 }
+
+class Game{
+  cards;
+  firstCard;
+  secondCard;
+  locked;
+  matched;
+  moves;
+  totalPairs;
+  timerId;
+  onUpdate;
+
+  constructor(config, onUpdate){
+
+  }
+
+  start(){
+
+  }
+
+  flip(cardId){
+
+  }
+
+  resetTurn(){
+    this.firstCard = none;
+    this.secondCard = none;
+    this.locked = false;
+  }
+
+  isWon(){
+
+  }
+
+  cancelTimer(){
+
+  }
+
+}
+
+class GameView{
+  container;
+  onCardClick;
+  cardElements;
+
+  constructor(container, onCardClick){
+
+  }
+
+  render(cards){
+
+  }
+
+  flipCard(cardId){
+
+  }
+
+  inflipCard(cardId){
+
+  }
+
+  markMatched(cardId){
+
+  }
+
+  createCardElemet(card){
+
+  }
+}
+
+class Modal{
+  root;
+  content;
+  isOpen;
+
+  constructor(){
+
+  }
+
+  open(contentNode){
+
+  }
+
+  close(){
+
+  }
+
+  setContent(){
+
+  }
+}
+
+class Leaderboard{
+  storageKey;
+  maxEntries = 10;
+
+  load(){
+    localStorage.getItem();
+  }
+
+  addResult(moves){
+    localStorage.setItem();
+  }
+
+  getTop(){
+
+  }
+
+  update(){
+
+  }
+}
+
+class App{
+  game;
+  board;
+  leaderBoardModal;
+  
+  constructor(){
+    game = new Game();
+    board = new GameView();
+    leaderBoardModal = new Modal();
+  }
+
+  startNewGame(){
+
+  }
+
+  handleCardClick(cardId){
+    this.game.flip();
+    this.game.update();
+  }
+
+  handleModal(){
+
+  }
+
+  handleShowLeaderboard(){
+
+  }
+
+  updateStatus(){}
+
+  init() {}
+}
