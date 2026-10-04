@@ -46,7 +46,8 @@ class CardGenerator {
     return cardsArray;
   }
 
-  static createDeck(numOfCards, mode) {
+  // mode: зарезервировано для HSL
+  static createDeck(numOfCards, mode) { 
     const base = this.createCards(numOfCards, mode);
     const paired = this.createPairs(base);
     return this.shuffle(paired);
@@ -56,13 +57,17 @@ class CardGenerator {
 class Game{
   #cards = null;
   #firstCard = null;
+  #firstIndex = null;
   #secondCard = null;
+  #secondIndex = null;
   #locked = false;
   #matched = 0;
   #moves = 0;
   #totalPairs = 0;
   #timerId = null;
   #config = null;
+  #flippedIndices = new Set();
+  #matchedIndices = new Set();
 
   constructor(config){
     this.#config = config;
@@ -72,27 +77,74 @@ class Game{
   get matched() { return this.#matched; }
   get moves() { return this.#moves; }
 
-  start(){
-    this.#cancelTimer();
-    this.#cards = CardGenerator.createDeck(this.#config.pairs, this.#config.colorMode);
-    this.resetTurn();
-    this.#matched = 0;
-    this.#moves = 0;
+start() {
+  this.#cancelTimer();
+  this.#cards = CardGenerator.createDeck(this.#config.pairs);
+  this.#resetTurn();
+  this.#flippedIndices.clear();
+  this.#matchedIndices.clear();
+  this.#matched = 0;
+  this.#moves = 0;
+}
+
+flip(cardIndex) {
+  if (this.#locked) return { action: 'ignored', reason: 'locked' };
+  if (this.#flippedIndices.has(cardIndex)) return { action: 'ignored', reason: 'already-flipped' };
+  if (this.#matchedIndices.has(cardIndex)) return { action: 'ignored', reason: 'already-matched' };
+
+  const card = this.#cards[cardIndex];
+
+  if (!this.#firstCard) {
+    this.#firstCard = card;
+    this.#firstIndex = cardIndex;
+    this.#flippedIndices.add(cardIndex);
+    return { action: 'first', cardIndex };
   }
 
-  flip(cardId){
+  this.#secondCard = card;
+  this.#secondIndex = cardIndex;
+  this.#flippedIndices.add(cardIndex);
+  this.#moves++;
 
+  if (this.#firstCard.id === this.#secondCard.id) {
+    this.#matchedIndices.add(this.#firstIndex);
+    this.#matchedIndices.add(this.#secondIndex);
+    this.#matched++;
+
+    const result = {
+      action: 'match',
+      firstIndex: this.#firstIndex,
+      secondIndex: this.#secondIndex
+    };
+    this.#resetTurn();
+    return result;
   }
+
+  const firstIndex = this.#firstIndex;
+  const secondIndex = this.#secondIndex;
+
+  this.#locked = true;
+  this.#timerId = setTimeout(() => {
+    this.#flippedIndices.delete(firstIndex);
+    this.#flippedIndices.delete(secondIndex);
+    this.#timerId = null;
+    this.#resetTurn();
+  }, this.#config.flipBackDelay);
+
+  return { action: 'mismatch', firstIndex, secondIndex };
+}
 
   isWon() {
     return this.#matched === this.#totalPairs;
   }
 
-  resetTurn(){
-    this.#firstCard = null;
-    this.#secondCard = null;
-    this.#locked = false;
-  }
+#resetTurn() {
+  this.#firstCard = null;
+  this.#secondCard = null;
+  this.#firstIndex = null;
+  this.#secondIndex = null;
+  this.#locked = false;
+}
 
 
   #cancelTimer(){
